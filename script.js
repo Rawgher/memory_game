@@ -9,6 +9,7 @@ let allCards = cards.length;
 let bestScore = localStorage.getItem('bestScore');
 let start = document.getElementById('game-start');
 let startBtn = document.getElementById("start-btn");
+let gameOverDiv = document.getElementById('game-over')
 
 if (bestScore) {
   document.getElementById('top-score').innerText = bestScore;
@@ -22,7 +23,8 @@ startBtn.addEventListener('click', handleGameStart);
 
 function handleGameStart() {
   setScore(0);
-  start.classList.add("playing");
+  start.classList.add("hide");
+  gameContainer.classList.remove('hide');
   let idxs = [];
   for (let i = 1; i <= allCards / 2; i++) {
     idxs.push(i.toString());
@@ -85,5 +87,18 @@ function handleCardClick(event) {
     }
   }
 
-  if (flipped === allCards) endGame();
+  if (flipped === allCards) gameOver();
+}
+
+function gameOver() {
+  gameContainer.classList.add('hide');
+  gameOverDiv.classList.remove('hide');
+  let scoreHolder = document.getElementById("final-score");
+  scoreHolder.innerText = "Your score: " + score;
+  let bestScore = localStorage.getItem("bestScore") || Infinity;
+  if (score < bestScore) {
+    scoreHolder.innerText += " -  This is a new high score";
+    localStorage.setItem("bestScore", score);
+  }
+  document.getElementById("game-over").classList.add("game-over");
 }

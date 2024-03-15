@@ -8,12 +8,12 @@
   <body>
     <div id="game-start">
       <h1>Cat Match</h1>
-      <p>Previous High Score: <span id='top-score'>0</span></p>
+      <p>Previous High Score: <span id='top-score'></span></p>
       <button id="start-btn">Start Game</button>
     </div>
-    <div id="game">
+    <div id="game" class="hide">
       <div class="scoreboard">
-        <p id="score"></p>
+        <p>Current Score: <span id="score"></span></p>
       </div>
       <div id="card-board">
         <div class="sizing-div">  
@@ -281,10 +281,12 @@
         </div>
       </div>
     </div>
-    <div id="game-over">
-      <h1>Good Job!</h1>
-      <p class="final-score"></p>
-      <a href="/" id="restart-btn">Restart Game</a>
+    <div id="game-over" class="hide">
+      <h1>GREAT WORK!</h1>
+      <p id="final-score">test</p>
+      <a href="/" id="restart-btn">
+        <button>Restart Game</button>
+      </a>
     </div>
     <script src="script.js"></script>
   </body>
