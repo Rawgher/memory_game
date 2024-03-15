@@ -3,86 +3,87 @@ let card1 = null;
 let card2 = null;
 let flipped = 0;
 let stopClicks = false;
+let score = 0;
+const cards = document.querySelectorAll(".card");
+let allCards = cards.length;
+let bestScore = localStorage.getItem('bestScore');
+let start = document.getElementById('game-start');
+let startBtn = document.getElementById("start-btn");
 
-const COLORS = [
-  "red",
-  "blue",
-  "green",
-  "orange",
-  "purple",
-  "red",
-  "blue",
-  "green",
-  "orange",
-  "purple"
-];
-
-
-function shuffle(array) {
-  let counter = array.length;
-
-  while (counter > 0) {
-    let index = Math.floor(Math.random() * counter);
-    counter--;
-    let temp = array[counter];
-    array[counter] = array[index];
-    array[index] = temp;
-  }
-
-  return array;
+if (bestScore) {
+  document.getElementById('top-score').innerText = bestScore;
 }
 
-let shuffledColors = shuffle(COLORS);
+for (card of cards) {
+  card.addEventListener('click', handleCardClick);
+}
 
-function createDivsForColors(colorArray) {
-  for (let color of colorArray) {
-    const newDiv = document.createElement("div");
-    newDiv.classList.add(color);
-    newDiv.addEventListener("click", handleCardClick);
-    gameContainer.append(newDiv);
+startBtn.addEventListener('click', handleGameStart);
+
+function handleGameStart() {
+  setScore(0);
+  start.classList.add("playing");
+  let idxs = [];
+  for (let i = 1; i <= allCards / 2; i++) {
+    idxs.push(i.toString());
   }
+  let pairs = shuffle(idxs.concat(idxs));
+
+  for (let i = 0; i < cards.length; i++) {
+    let path = "cats/cat" + pairs[i] + '.jpg';
+    cards[i].children[1].children[0].src = path;
+  }
+}
+
+function shuffle(arr) {
+  let newArr = arr.slice();
+  for (let i1 = newArr.length - 1; i1 > 0; i1--) {
+    let i2 = Math.floor(Math.random() * (i1 + 1));
+    let hold = newArr[i1];
+    newArr[i1] = newArr[i2];
+    newArr[i2] = hold;
+  }
+  return newArr;
+}
+
+function setScore(newScore) {
+  score = newScore;
+  document.getElementById("score").innerText = score;
 }
 
 function handleCardClick(event) {
-  // console.log("you just clicked", event.target);
-  if (stopClicks) return;
-  if (event.target.classList.contains("flippedCards")) return;
+  if (!event.target.classList.contains("card-front")) return;
 
-  let currentCard = event.target;
-  currentCard.style.backgroundColor = currentCard.classList[0];
+  let thisCard = event.target.parentElement;
 
   if (!card1 || !card2) {
-    currentCard.classList.add("flippedCards");
-    card1 = card1 || currentCard;
-    card2 = currentCard === card1 ? null : currentCard;
+    if (!thisCard.classList.contains("cardFlipped")) {
+      setScore(score + 1);
+    }
+    thisCard.classList.add("cardFlipped");
+    card1 = card1 || thisCard;
+    card2 = thisCard === card1 ? null : thisCard;
   }
 
   if (card1 && card2) {
-    stopClicks = true;
-    let classA = card1.className;
-    let classB = card2.className;
+    let cat1 = card1.children[1].children[0].src;
+    let cat2 = card2.children[1].children[0].src;
 
-    if (classA === classB) {
+    if (cat1 === cat2) {
       flipped += 2;
       card1.removeEventListener("click", handleCardClick);
       card2.removeEventListener("click", handleCardClick);
       card1 = null;
       card2 = null;
-      stopClicks = false;
     } else {
       setTimeout(function() {
-        card1.style.backgroundColor = "";
-        card2.style.backgroundColor = "";
-        card1.classList.remove("flippedCards");
-        card2.classList.remove("flippedCards");
+        card1.classList.remove("cardFlipped");
+        card2.classList.remove("cardFlipped");
         card1 = null;
         card2 = null;
-        stopClicks = false;
       }, 500);
     }
   }
 
-  if (flipped === COLORS.length) alert("game over!");
+  if (flipped === allCards) endGame();
 }
-
-createDivsForColors(shuffledColors);
